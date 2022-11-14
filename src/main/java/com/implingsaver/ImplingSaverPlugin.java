@@ -178,6 +178,7 @@ public class ImplingSaverPlugin extends Plugin
 			CLUE_SCROLL_EASY_23150,
 			CLUE_SCROLL_EASY_23151,
 			CLUE_SCROLL_EASY_23152,
+			CLUE_SCROLL_EASY_23153,
 			CLUE_SCROLL_EASY_23154,
 			CLUE_SCROLL_EASY_23155,
 			CLUE_SCROLL_EASY_23156,
@@ -679,6 +680,7 @@ public class ImplingSaverPlugin extends Plugin
 	public void onClientTick(ClientTick clientTick) {
 		removeOpenOption();
 		resetContains();
+
 	}
 
 	@Provides
@@ -732,7 +734,7 @@ public class ImplingSaverPlugin extends Plugin
 		if(config.hardMode() && containHardClue) {
 			for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
 				int id = inventoryItem.getItemId();
-				if (id == MAGPIE_IMPLING_JAR || id == NINJA_IMPLING_JAR) {
+				if (id == MAGPIE_IMPLING_JAR || id == NINJA_IMPLING_JAR || id == NATURE_IMPLING_JAR) {
 					inventoryItem.setHidden(true);
 				}
 			}
@@ -741,7 +743,7 @@ public class ImplingSaverPlugin extends Plugin
 		if(config.eliteMode() && containEliteClue) {
 			for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
 				int id = inventoryItem.getItemId();
-				if (id == DRAGON_IMPLING_JAR) {
+				if (id == DRAGON_IMPLING_JAR || id == CRYSTAL_IMPLING_JAR) {
 					inventoryItem.setHidden(true);
 				}
 			}
