@@ -671,9 +671,13 @@ public class ImplingSaverPlugin extends Plugin
 	));
 
 	private boolean containBeginnerClue;
+	private boolean easyClueScan = false;
 	private boolean containEasyClue;
+	private boolean mediumClueScan = false;
 	private boolean containMediumClue;
+	private boolean hardClueScan = false;
 	private boolean containHardClue;
+	private boolean eliteClueScan = false;
 	private boolean containEliteClue;
 
 	@Subscribe
@@ -700,18 +704,23 @@ public class ImplingSaverPlugin extends Plugin
 
 		for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
 			if(easyClues.contains(inventoryItem.getItemId())) {
-				containEasyClue = true;
+				easyClueScan = true;
 			}
 			else if(mediumClues.contains(inventoryItem.getItemId())) {
-				containMediumClue = true;
+				mediumClueScan = true;
 			}
 			else if(hardClues.contains(inventoryItem.getItemId())) {
-				containHardClue = true;
+				hardClueScan = true;
 			}
 			else if(eliteClues.contains(inventoryItem.getItemId())) {
-				containEliteClue = true;
+				eliteClueScan = true;
 			}
 		}
+
+		containEasyClue = easyClueScan ? (containEasyClue = true) : (containEasyClue = false);
+		containMediumClue = mediumClueScan ? (containMediumClue = true) : (containMediumClue = false);
+		containHardClue = hardClueScan ? (containHardClue = true) : (containHardClue = false);
+		containEliteClue = eliteClueScan ? (containEliteClue = true) : (containEliteClue = false);
 
 		if(config.easyMode() && containEasyClue) {
 			for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
@@ -757,10 +766,9 @@ public class ImplingSaverPlugin extends Plugin
 	 * there isn't a corresponding clue in inventory
 	 */
 	private void resetContains() {
-		containBeginnerClue = false;
-		containEasyClue = false;
-		containMediumClue = false;
-		containHardClue = false;
-		containEliteClue = false;
+		easyClueScan = false;
+		mediumClueScan = false;
+		hardClueScan = false;
+		eliteClueScan = false;
 	}
 }
