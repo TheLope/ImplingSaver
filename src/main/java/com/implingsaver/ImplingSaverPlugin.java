@@ -684,7 +684,6 @@ public class ImplingSaverPlugin extends Plugin
 	public void onClientTick(ClientTick clientTick) {
 		removeOpenOption();
 		resetContains();
-
 	}
 
 	@Provides
