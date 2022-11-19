@@ -33,6 +33,10 @@ public class ImplingSaverPlugin extends Plugin
 	@Inject
 	private ImplingSaverConfig config;
 
+	public ArrayList beginnerClues = new ArrayList(Arrays.asList(
+			CLUE_SCROLL_BEGINNER
+	));
+
 	public ArrayList easyClues = new ArrayList(Arrays.asList(
 			CLUE_SCROLL_EASY,
 			CLUE_SCROLL_EASY_2678,
@@ -670,6 +674,7 @@ public class ImplingSaverPlugin extends Plugin
 			CLUE_SCROLL_ELITE_26944
 	));
 
+	private boolean beginnerClueScan = false;
 	private boolean containBeginnerClue;
 	private boolean easyClueScan = false;
 	private boolean containEasyClue;
@@ -702,7 +707,10 @@ public class ImplingSaverPlugin extends Plugin
 			return;
 
 		for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
-			if(easyClues.contains(inventoryItem.getItemId())) {
+			if(beginnerClues.contains(inventoryItem.getItemId())) {
+				beginnerClueScan = true;
+			}
+			else if(easyClues.contains(inventoryItem.getItemId())) {
 				easyClueScan = true;
 			}
 			else if(mediumClues.contains(inventoryItem.getItemId())) {
@@ -716,10 +724,20 @@ public class ImplingSaverPlugin extends Plugin
 			}
 		}
 
+		containBeginnerClue = beginnerClueScan ? (containBeginnerClue = true) : (containBeginnerClue = false);
 		containEasyClue = easyClueScan ? (containEasyClue = true) : (containEasyClue = false);
 		containMediumClue = mediumClueScan ? (containMediumClue = true) : (containMediumClue = false);
 		containHardClue = hardClueScan ? (containHardClue = true) : (containHardClue = false);
 		containEliteClue = eliteClueScan ? (containEliteClue = true) : (containEliteClue = false);
+
+		if(config.beginnerMode() && containBeginnerClue) {
+			for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
+				int id = inventoryItem.getItemId();
+				if (id == YOUNG_IMPLING_JAR || id == BABY_IMPLING_JAR) {
+					inventoryItem.setHidden(true);
+				}
+			}
+		}
 
 		if(config.easyMode() && containEasyClue) {
 			for (Widget inventoryItem : Objects.requireNonNull(inventory.getChildren())) {
