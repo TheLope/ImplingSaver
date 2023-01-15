@@ -783,6 +783,7 @@ public class ImplingSaverPlugin extends Plugin
 	 * there isn't a corresponding clue in inventory
 	 */
 	private void resetContains() {
+		beginnerClueScan = false;
 		easyClueScan = false;
 		mediumClueScan = false;
 		hardClueScan = false;
