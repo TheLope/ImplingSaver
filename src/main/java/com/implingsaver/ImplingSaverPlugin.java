@@ -24,7 +24,6 @@ import static net.runelite.api.ItemID.*;
         name = "ImplingSaver"
 )
 public class ImplingSaverPlugin extends Plugin {
-    public int beginnerClues = CLUE_SCROLL_BEGINNER;
     public ArrayList<Integer> easyClues = new ArrayList<>(Arrays.asList(
             CLUE_SCROLL_EASY, CLUE_SCROLL_EASY_2678, CLUE_SCROLL_EASY_2679, CLUE_SCROLL_EASY_2680,
             CLUE_SCROLL_EASY_2681, CLUE_SCROLL_EASY_2682, CLUE_SCROLL_EASY_2683, CLUE_SCROLL_EASY_2684,
@@ -224,19 +223,22 @@ public class ImplingSaverPlugin extends Plugin {
             hasHardClue = false;
             hasEliteClue = false;
 
-            for (Item item : event.getItemContainer().getItems()) {
-                if (!hasBeginnerClue && beginnerClues == item.getId()) {
-                    hasBeginnerClue = true;
-                } else if (!hasEasyClue && easyClues.contains(item.getId())) {
-                    hasEasyClue = true;
-                } else if (!hasMediumClue && mediumClues.contains(item.getId())) {
-                    hasMediumClue = true;
-                } else if (!hasHardClue && hardClues.contains(item.getId())) {
-                    hasHardClue = true;
-                } else if (!hasEliteClue && eliteClues.contains(item.getId())) {
-                    hasEliteClue = true;
-                }
-            }
+            Arrays.stream(event.getItemContainer().getItems())
+                    // No need to loop over all conditions if either a jar or nothing is found, as these are the most common items it will loop
+                    .filter(item -> item.getId() != IMPLING_JAR && item.getId() != -1)
+                    .forEach(item -> {
+                        if (!hasBeginnerClue && item.getId() == CLUE_SCROLL_BEGINNER) {
+                            hasBeginnerClue = true;
+                        } else if (!hasEasyClue && easyClues.contains(item.getId())) {
+                            hasEasyClue = true;
+                        } else if (!hasMediumClue && mediumClues.contains(item.getId())) {
+                            hasMediumClue = true;
+                        } else if (!hasHardClue && hardClues.contains(item.getId())) {
+                            hasHardClue = true;
+                        } else if (!hasEliteClue && eliteClues.contains(item.getId())) {
+                            hasEliteClue = true;
+                        }
+                    });
         }
     }
 
@@ -287,20 +289,19 @@ public class ImplingSaverPlugin extends Plugin {
 
     private void checkImps(MenuEntry[] menuEntries, int index) {
         MenuEntry menuEntry = menuEntries[index];
-        String target = Text.removeTags(menuEntry.getTarget()).toLowerCase();
-        if ((target.equals("baby impling jar") || (target.equals("young impling jar")))
+        if ((menuEntry.getItemId() == BABY_IMPLING_JAR || menuEntry.getItemId() == YOUNG_IMPLING_JAR)
                 && config.beginnerMode() && hasBeginnerClue) {
             doSwaps(menuEntries);
-        } else if ((target.equals("gourmet impling jar") || (target.equals("young impling jar")))
+        } else if ((menuEntry.getItemId() == GOURMET_IMPLING_JAR || menuEntry.getItemId() == YOUNG_IMPLING_JAR)
                 && config.easyMode() && hasEasyClue) {
             doSwaps(menuEntries);
-        } else if ((target.equals("earth impling jar") || target.equals("essence impling jar") || target.equals("eclectic impling jar"))
+        } else if ((menuEntry.getItemId() == EARTH_IMPLING_JAR || menuEntry.getItemId() == ESSENCE_IMPLING_JAR || menuEntry.getItemId() == ECLECTIC_IMPLING_JAR)
                 && config.mediumMode() && hasMediumClue) {
             doSwaps(menuEntries);
-        } else if ((target.equals("nature impling jar") || target.equals("magpie impling jar") || target.equals("ninja impling jar"))
+        } else if ((menuEntry.getItemId() == NATURE_IMPLING_JAR || menuEntry.getItemId() == MAGPIE_IMPLING_JAR || menuEntry.getItemId() == NINJA_IMPLING_JAR)
                 && config.hardMode() && hasHardClue) {
             doSwaps(menuEntries);
-        } else if ((target.equals("crystal impling jar") || target.equals("dragon impling jar"))
+        } else if ((menuEntry.getItemId() == CRYSTAL_IMPLING_JAR || menuEntry.getItemId() == DRAGON_IMPLING_JAR)
                 && config.eliteMode() && hasEliteClue) {
             doSwaps(menuEntries);
         }
