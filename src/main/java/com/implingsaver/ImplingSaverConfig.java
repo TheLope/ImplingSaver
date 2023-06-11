@@ -57,6 +57,6 @@ public interface ImplingSaverConfig extends Config {
             description = "Add a cooldown to opening Impling Jars so you can spam click."
     )
     default boolean jarCooldown() {
-        return true;
+        return false;
     }
 }
