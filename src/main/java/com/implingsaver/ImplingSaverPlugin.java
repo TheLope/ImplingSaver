@@ -212,7 +212,7 @@ public class ImplingSaverPlugin extends Plugin {
     private boolean hasMediumClue = false;
     private boolean hasHardClue = false;
     private boolean hasEliteClue = false;
-    private int jarCooldown = 1;
+    private int jarCooldown;
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
