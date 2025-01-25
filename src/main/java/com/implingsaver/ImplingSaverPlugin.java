@@ -155,23 +155,13 @@ public class ImplingSaverPlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (event.getContainerId() == InventoryID.INVENTORY.getId())
-		{
-			ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
-
-			if (inventoryContainer != null)
-			{
-				checkContainer(inventoryContainer, true);
-			}
-		}
-
 		if (event.getContainerId() == InventoryID.BANK.getId())
 		{
 			ItemContainer bankContainer = client.getItemContainer(InventoryID.BANK);
 
 			if (bankContainer != null)
 			{
-				checkContainer(bankContainer, false);
+				checkContainer(bankContainer);
 			}
 		}
 	}
@@ -198,7 +188,7 @@ public class ImplingSaverPlugin extends Plugin
 		return configManager.getConfig(ImplingSaverConfig.class);
 	}
 
-	private void checkContainer(ItemContainer container, boolean inventoryCheck)
+	private void checkContainer(ItemContainer container)
 	{
 		String[] cluesToFind = {
 			BEGINNER_ITEM_NAME,
@@ -228,12 +218,11 @@ public class ImplingSaverPlugin extends Plugin
 		}
 
 		// Set state of each clue based on what was found
-		// When inventoryCheck is true set "...InBank" to false for foundClues
-		setBeginnerInBank(inventoryCheck == Collections.disjoint(Collections.singletonList(BEGINNER_ITEM_NAME), foundClues));
-		setEasyInBank(inventoryCheck == Collections.disjoint(Collections.singletonList(EASY_ITEM_NAME), foundClues));
-		setMediumInBank(inventoryCheck == Collections.disjoint(Arrays.asList(MEDIUM_ITEM_NAME, MEDIUM_CHALLENGE_ITEM_NAME), foundClues));
-		setHardInBank(inventoryCheck == Collections.disjoint(Arrays.asList(HARD_ITEM_NAME, HARD_CHALLENGE_ITEM_NAME), foundClues));
-		setEliteInBank(inventoryCheck == Collections.disjoint(Arrays.asList(ELITE_ITEM_NAME, ELITE_CHALLENGE_ITEM_NAME), foundClues));
+		setBeginnerInBank(!Collections.disjoint(Collections.singletonList(BEGINNER_ITEM_NAME), foundClues));
+		setEasyInBank(!Collections.disjoint(Collections.singletonList(EASY_ITEM_NAME), foundClues));
+		setMediumInBank(!Collections.disjoint(Arrays.asList(MEDIUM_ITEM_NAME, MEDIUM_CHALLENGE_ITEM_NAME), foundClues));
+		setHardInBank(!Collections.disjoint(Arrays.asList(HARD_ITEM_NAME, HARD_CHALLENGE_ITEM_NAME), foundClues));
+		setEliteInBank(!Collections.disjoint(Arrays.asList(ELITE_ITEM_NAME, ELITE_CHALLENGE_ITEM_NAME), foundClues));
 	}
 
 	public String getItemName(Integer itemId)
@@ -417,13 +406,6 @@ public class ImplingSaverPlugin extends Plugin
 
 	private void manageRSProfileConfiguration(String key, Boolean bool)
 	{
-		if (bool)
-		{
-			configManager.setRSProfileConfiguration(ImplingSaverConfig.CONFIG_GROUP, key, true);
-		}
-		else
-		{
-			configManager.unsetRSProfileConfiguration(ImplingSaverConfig.CONFIG_GROUP, key);
-		}
+		configManager.setRSProfileConfiguration(ImplingSaverConfig.CONFIG_GROUP, key, bool);
 	}
 }
