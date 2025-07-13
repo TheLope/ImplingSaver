@@ -12,20 +12,27 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import static net.runelite.api.ItemID.*;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.chat.ChatColorType;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
@@ -117,6 +124,12 @@ public class ImplingSaverPlugin extends Plugin
 	private OverlayManager overlayManager;
 
 	@Inject
+	PluginManager pluginManager;
+
+	@Inject
+	private ChatMessageManager chatMessageManager;
+
+	@Inject
 	private ImplingSaverOverlay infoOverlay;
 
 	@Inject
@@ -127,12 +140,14 @@ public class ImplingSaverPlugin extends Plugin
     private boolean mediumInBank = false;
     private boolean hardInBank = false;
     private boolean eliteInBank = false;
+	private boolean loggingIn;
 
 	@Override
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(infoOverlay);
 		clientThread.invoke(this::loadFromConfig);
+		loggingIn = true;
 	}
 
 	@Override
@@ -140,6 +155,15 @@ public class ImplingSaverPlugin extends Plugin
 	{
 		overlayManager.remove(infoOverlay);
 		removeInfoBox();
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged event)
+	{
+		if (event.getGameState() == GameState.LOGGING_IN)
+		{
+			loggingIn = true;
+		}
 	}
 
 	@Subscribe
@@ -176,6 +200,12 @@ public class ImplingSaverPlugin extends Plugin
 	public void onGameTick(GameTick event)
 	{
 		handleInfoBox();
+
+		if (loggingIn)
+		{
+			loggingIn = false;
+			notifyPluginInstall();
+		}
 	}
 
 	@Provides
@@ -409,5 +439,28 @@ public class ImplingSaverPlugin extends Plugin
 	private void manageRSProfileConfiguration(String key, Boolean bool)
 	{
 		configManager.setRSProfileConfiguration(ImplingSaverConfig.CONFIG_GROUP, key, bool);
+	}
+
+	private void notifyPluginInstall()
+	{
+		if (pluginManager.getPlugins().stream().noneMatch(plugin -> plugin.getName().equals("Clue Saver")))
+		{
+			sendChatConsoleMessage("ImplingSaver functionality has been integrated into Clue Saver. " +
+				"Please install Clue Saver to take advantage of the latest features.");
+		}
+	}
+
+	private void sendChatConsoleMessage(String chatMessage)
+	{
+		final String message = new ChatMessageBuilder()
+			.append(ChatColorType.HIGHLIGHT)
+			.append(chatMessage)
+			.build();
+
+		chatMessageManager.queue(
+			QueuedMessage.builder()
+				.type(ChatMessageType.CONSOLE)
+				.runeLiteFormattedMessage(message)
+				.build());
 	}
 }
